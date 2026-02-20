@@ -1,4 +1,14 @@
-import type { CrosswordApi, PuzzleSummary, Puzzle } from "./CrosswordApi";
+import { z } from "zod";
+import {
+  type Attempt,
+  type CrosswordApi,
+  type PuzzleSummary,
+  type Puzzle,
+  PuzzleSchema,
+  AttemptSchema,
+  PuzzleSummarySchema,
+  type Clue,
+} from "./CrosswordApi";
 
 export class RestCrosswordApi implements CrosswordApi {
   private baseUrl: string;
@@ -48,6 +58,66 @@ export class RestCrosswordApi implements CrosswordApi {
     return this.handlePuzzleResponse(response);
   }
 
+  async createAttempt(puzzleId: string): Promise<Attempt> {
+    const url = this.prefixBaseUrl(`/v1/puzzles/${puzzleId}/attempts`);
+    const request = {
+      method: "POST",
+    };
+
+    const response = await fetch(url, request);
+
+    return this.handleAttemptResponse(response);
+  }
+
+  async autoSolveAttempt(
+    puzzleId: string,
+    attemptId: string,
+  ): Promise<Attempt> {
+    const url = this.prefixBaseUrl(
+      `/v1/puzzles/${puzzleId}/attempts/${attemptId}/automatic-answers`,
+    );
+    const request = {
+      method: "POST",
+    };
+
+    const response = await fetch(url, request);
+
+    return this.handleAttemptResponse(response);
+  }
+
+  async getAttemptById(puzzleId: string, attemptId: string): Promise<Attempt> {
+    const url = this.prefixBaseUrl(
+      `/v1/puzzles/${puzzleId}/attempts/${attemptId}`,
+    );
+
+    const response = await fetch(url);
+
+    return this.handleAttemptResponse(response);
+  }
+
+  async updateAttemptAnswer(
+    puzzleId: string,
+    attemptId: string,
+    clue: Clue,
+    answer: string,
+  ): Promise<Attempt> {
+    const url = this.prefixBaseUrl(
+      `/v1/puzzles/${puzzleId}/attempts/${attemptId}/answers`,
+    );
+    const request = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: clue.id,
+        value: answer.toUpperCase(),
+      }),
+    };
+
+    const response = await fetch(url, request);
+
+    return this.handleAttemptResponse(response);
+  }
+
   private prefixBaseUrl(path: string) {
     return `${this.baseUrl}${path}`;
   }
@@ -59,43 +129,24 @@ export class RestCrosswordApi implements CrosswordApi {
   }
 
   private async handlePuzzleResponse(response: Response): Promise<Puzzle> {
-    return this.handleResponse<Puzzle>(response, [
-      "createdAt",
-    ]) as Promise<Puzzle>;
+    return this.parse(response, PuzzleSchema);
   }
 
   private async handlePuzzleSummariesResponse(
     response: Response,
   ): Promise<PuzzleSummary[]> {
-    return this.handleResponse<PuzzleSummary>(response, [
-      "createdAt",
-    ]) as Promise<PuzzleSummary[]>;
+    return this.parse(response, z.array(PuzzleSummarySchema));
   }
 
-  private async handleResponse<T>(
-    response: Response,
-    dateFields: (keyof T)[] = [],
-  ): Promise<T | T[]> {
+  private async handleAttemptResponse(response: Response): Promise<Attempt> {
+    return this.parse(response, AttemptSchema);
+  }
+
+  private async parse<T>(response: Response, schema: z.ZodType<T>): Promise<T> {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-
-    const data = await response.json();
-
-    if (Array.isArray(data)) {
-      return data.map((item) => this.parseResponseDates<T>(item, dateFields));
-    }
-
-    return this.parseResponseDates<T>(data, dateFields);
-  }
-
-  private parseResponseDates<T>(data: any, dateFields: (keyof T)[]): T {
-    const result = { ...data };
-    for (const key of dateFields) {
-      if (result[key] && typeof result[key] === "string") {
-        result[key] = new Date(result[key]) as any;
-      }
-    }
-    return result as T;
+    const json = await response.json();
+    return schema.parse(json);
   }
 }
