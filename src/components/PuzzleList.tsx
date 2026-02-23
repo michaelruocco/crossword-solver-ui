@@ -14,7 +14,7 @@ const PuzzleList: React.FC = () => {
   return (
     <Grid container spacing={2}>
       {puzzles.map((puzzle) => (
-        <Grid item xs={12} sm={6} md={4} key={puzzle.id}>
+        <Grid key={puzzle.id}>
           <PuzzleTile puzzle={puzzle} />
         </Grid>
       ))}

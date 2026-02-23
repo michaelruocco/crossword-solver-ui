@@ -33,14 +33,16 @@ const PuzzlePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!puzzle || !attempt) {
+    if (!puzzle || !attempt?.solving) {
       return;
     }
+
     const interval = setInterval(() => {
       fetchAttempt(puzzle?.id, attempt.id);
     }, 2000);
+
     return () => clearInterval(interval);
-  }, [attempt?.id]);
+  }, [attempt?.solving]);
 
   const handleStart = async () => {
     if (!puzzle) {
@@ -134,7 +136,7 @@ const PuzzlePage: React.FC = () => {
             variant="contained"
             color="secondary"
             onClick={handleSolve}
-            disabled={!attempt}
+            disabled={attempt?.solving}
           >
             Solve
           </Button>{" "}

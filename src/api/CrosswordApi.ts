@@ -71,5 +71,6 @@ export const PuzzleSummarySchema = z.object({
 
 export const AttemptSchema = z.object({
   id: z.string(),
+  solving: z.boolean(),
   puzzle: PuzzleSchema,
 });
