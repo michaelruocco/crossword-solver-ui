@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <Container maxWidth="lg">
+    <Container sx={{ mt: 4 }}>
       <PuzzleFileUpload />
 
       {loading && <Typography>Loading puzzles...</Typography>}

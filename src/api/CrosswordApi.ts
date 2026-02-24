@@ -15,6 +15,7 @@ export interface CrosswordApi {
     clue: Clue,
     answer: string,
   ): Promise<Attempt>;
+  getPuzzleAttemptSummaries(puzzleId: string): Promise<AttemptSummary[]>;
 }
 
 export type Coordinates = z.infer<typeof CoordinatesSchema>;
@@ -25,6 +26,7 @@ export type Clues = z.infer<typeof CluesSchema>;
 export type Puzzle = z.infer<typeof PuzzleSchema>;
 export type PuzzleSummary = z.infer<typeof PuzzleSummarySchema>;
 export type Attempt = z.infer<typeof AttemptSchema>;
+export type AttemptSummary = z.infer<typeof AttemptSummarySchema>;
 
 export const CoordinatesSchema = z.object({ x: z.number(), y: z.number() });
 
@@ -67,10 +69,20 @@ export const PuzzleSummarySchema = z.object({
   name: z.string(),
   createdAt: z.coerce.date(),
   attemptCount: z.number(),
+  clueCount: z.number(),
 });
 
 export const AttemptSchema = z.object({
   id: z.string(),
+  createdAt: z.coerce.date(),
   solving: z.boolean(),
   puzzle: PuzzleSchema,
+});
+
+export const AttemptSummarySchema = z.object({
+  id: z.string(),
+  createdAt: z.coerce.date(),
+  solving: z.boolean(),
+  answerCount: z.number(),
+  clueCount: z.number(),
 });

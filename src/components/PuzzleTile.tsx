@@ -21,6 +21,9 @@ const PuzzleTile: React.FC<PuzzleTileProps> = ({ puzzle }) => {
             Created: <ShortDateTime date={puzzle.createdAt} showTime={true} />
           </Typography>
           <Typography variant="body2" color="text.secondary">
+            Clues: {puzzle.clueCount}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
             Attempts: {puzzle.attemptCount}
           </Typography>
         </CardContent>

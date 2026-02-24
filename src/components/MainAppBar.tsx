@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 
 const MainAppBar: React.FC = () => {
   return (
-    <AppBar position="static">
+    <AppBar
+      position="relative"
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
       <Toolbar>
         <Typography
           variant="h6"

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Container } from "@mui/material";
+import { Box } from "@mui/material";
 import MainAppBar from "./MainAppBar";
 
 interface LayoutProps {
@@ -8,10 +8,24 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
       <MainAppBar />
-      <Container sx={{ mt: 4 }}>{children}</Container>
-    </>
+      <Box
+        sx={{
+          display: "flex",
+          flex: 1,
+          overflow: "hidden",
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
   );
 };
 

@@ -8,6 +8,8 @@ import {
   AttemptSchema,
   PuzzleSummarySchema,
   type Clue,
+  type AttemptSummary,
+  AttemptSummarySchema,
 } from "./CrosswordApi";
 
 export class RestCrosswordApi implements CrosswordApi {
@@ -118,6 +120,14 @@ export class RestCrosswordApi implements CrosswordApi {
     return this.handleAttemptResponse(response);
   }
 
+  async getPuzzleAttemptSummaries(puzzleId: string): Promise<AttemptSummary[]> {
+    const url = this.prefixBaseUrl(`/v1/puzzles/${puzzleId}/attempt-summaries`);
+
+    const response = await fetch(url);
+
+    return this.handleAttemptSummariesResponse(response);
+  }
+
   private prefixBaseUrl(path: string) {
     return `${this.baseUrl}${path}`;
   }
@@ -140,6 +150,12 @@ export class RestCrosswordApi implements CrosswordApi {
 
   private async handleAttemptResponse(response: Response): Promise<Attempt> {
     return this.parse(response, AttemptSchema);
+  }
+
+  private async handleAttemptSummariesResponse(
+    response: Response,
+  ): Promise<AttemptSummary[]> {
+    return this.parse(response, z.array(AttemptSummarySchema));
   }
 
   private async parse<T>(response: Response, schema: z.ZodType<T>): Promise<T> {
