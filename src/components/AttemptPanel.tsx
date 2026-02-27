@@ -1,22 +1,41 @@
 import type { AttemptSummary } from "../api/CrosswordApi";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 interface Props {
   attempts: AttemptSummary[];
   selectedAttemptId?: string;
   onSelect: (id: string) => void;
+  onDeleteAll: () => void;
 }
 
 export default function AttemptPanel({
   attempts,
   selectedAttemptId,
   onSelect,
+  onDeleteAll,
 }: Props) {
   return (
     <>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Attempts
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1,
+          mb: 2,
+        }}
+      >
+        <Typography variant="h6">Attempts</Typography>
+        <Button
+          size="small"
+          color="error"
+          variant="outlined"
+          disabled={attempts.length === 0}
+          onClick={onDeleteAll}
+        >
+          Delete all
+        </Button>
+      </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         {attempts.length === 0 && (

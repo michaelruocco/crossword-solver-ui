@@ -8,9 +8,15 @@ interface Props {
   title: string;
   clues: Clue[];
   onClueClick?: (clue: Clue) => void;
+  onClearAnswer?: (clue: Clue) => void;
 }
 
-const ClueList: React.FC<Props> = ({ title, clues, onClueClick }) => {
+const ClueList: React.FC<Props> = ({
+  title,
+  clues,
+  onClueClick,
+  onClearAnswer,
+}) => {
   return (
     <Box
       sx={{
@@ -22,7 +28,12 @@ const ClueList: React.FC<Props> = ({ title, clues, onClueClick }) => {
         {title}
       </Typography>
       {clues.map((clue) => (
-        <ClueItem key={clue.id} clue={clue} onClick={onClueClick} />
+        <ClueItem
+          key={clue.id}
+          clue={clue}
+          onClick={onClueClick}
+          onClearAnswer={onClearAnswer}
+        />
       ))}
     </Box>
   );

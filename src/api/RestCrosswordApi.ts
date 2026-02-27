@@ -128,6 +128,36 @@ export class RestCrosswordApi implements CrosswordApi {
     return this.handleAttemptSummariesResponse(response);
   }
 
+  async deleteAttemptAnswer(
+    puzzleId: string,
+    attemptId: string,
+    clueId: string,
+  ): Promise<Attempt> {
+    const url = this.prefixBaseUrl(
+      `/v1/puzzles/${puzzleId}/attempts/${attemptId}/answers/${clueId}`,
+    );
+    const request = {
+      method: "DELETE",
+    };
+
+    const response = await fetch(url, request);
+
+    return this.handleAttemptResponse(response);
+  }
+
+  async deleteAllAttempts(puzzleId: string): Promise<void> {
+    const url = this.prefixBaseUrl(`/v1/puzzles/${puzzleId}/attempts`);
+    const request = {
+      method: "DELETE",
+    };
+
+    const response = await fetch(url, request);
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+  }
+
   private prefixBaseUrl(path: string) {
     return `${this.baseUrl}${path}`;
   }

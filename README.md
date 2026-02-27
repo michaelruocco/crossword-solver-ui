@@ -15,7 +15,5 @@ to be available on `http://localhost:8080`.
 ## TODO
 
 - Update local proxy config to enable overriding default local backend url with value supplied from an environment variable
-- Add page to list attempts for a puzzle once the backend API to return a list of attempts for a puzzle is available
-- Improve puzzle page handling for solving and auto solving by making use of attempt status once it has been added to backend API
 - Add answer validation to ensure matches pattern and add handling in UI for not correct
 - Improve answer input to match any crossing characters if there are any rather than being free text input

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Button, Typography, Container } from "@mui/material";
 import { useApi } from "../context/ApiContext";
-import type {
-  Attempt,
-  Puzzle,
-  Clue,
-  AttemptSummary,
+import {
+  type Attempt,
+  type Puzzle,
+  type Clue,
+  type AttemptSummary,
+  replaceAsAttemptSummary,
 } from "../api/CrosswordApi";
 import CrosswordGrid from "../components/CrosswordGrid";
 import Fade from "@mui/material/Fade";
@@ -41,14 +42,15 @@ const PuzzlePage: React.FC = () => {
     fetchPuzzle();
   }, [puzzleId]);
 
+  const fetchAttempts = async () => {
+    const puzzleAttempts = await api.getPuzzleAttemptSummaries(puzzleId);
+    setAttempts(puzzleAttempts);
+    if (!selectedAttemptId && puzzleAttempts.length > 0) {
+      setSelectedAttemptId(puzzleAttempts[0].id);
+    }
+  };
+
   useEffect(() => {
-    const fetchAttempts = async () => {
-      const list = await api.getPuzzleAttemptSummaries(puzzleId);
-      setAttempts(list);
-      if (!selectedAttemptId && list.length > 0) {
-        setSelectedAttemptId(list[0].id);
-      }
-    };
     fetchAttempts();
   }, [puzzleId]);
 
@@ -88,6 +90,7 @@ const PuzzlePage: React.FC = () => {
     const newAttempt = await api.createAttempt(puzzle.id);
     setSelectedAttemptId(newAttempt.id);
     setAttempt(newAttempt);
+    fetchAttempts();
   };
 
   const handleSolve = async () => {
@@ -98,12 +101,19 @@ const PuzzlePage: React.FC = () => {
       return;
     }
     const updatedAttempt = await api.autoSolveAttempt(puzzle.id, attempt.id);
-    setAttempt(updatedAttempt);
+    updateAttempt(updatedAttempt);
   };
 
   const fetchAttempt = async (puzzleId: string, attemptId: string) => {
     const fetchedAttempt = await api.getAttemptById(puzzleId, attemptId);
-    setAttempt(fetchedAttempt);
+    updateAttempt(fetchedAttempt);
+  };
+
+  const updateAttempt = (updatedAttempt: Attempt) => {
+    setAttempt(updatedAttempt);
+    setAttempts((existing) =>
+      replaceAsAttemptSummary(existing, updatedAttempt),
+    );
   };
 
   const handleClueClick = (clue: Clue) => {
@@ -123,12 +133,34 @@ const PuzzlePage: React.FC = () => {
       clue,
       answer,
     );
-    setAttempt(updatedAttempt);
+    updateAttempt(updatedAttempt);
     setSelectedClue(undefined);
+  };
+
+  const handleClearAnswer = async (clue: Clue) => {
+    if (!puzzle) {
+      return;
+    }
+    if (!attempt) {
+      return;
+    }
+    const updatedAttempt = await api.deleteAttemptAnswer(
+      puzzleId,
+      attempt.id,
+      clue.id,
+    );
+    updateAttempt(updatedAttempt);
   };
 
   const handleSelectAttempt = (id: string) => {
     setSelectedAttemptId(id);
+  };
+
+  const handleDeleteAllAttempts = async () => {
+    await api.deleteAllAttempts(puzzleId);
+    setAttempts([]);
+    setSelectedAttemptId(undefined);
+    setAttempt(undefined);
   };
 
   if (!puzzle) {
@@ -152,6 +184,7 @@ const PuzzlePage: React.FC = () => {
         attempts={attempts}
         selectedAttemptId={selectedAttemptId}
         onSelect={handleSelectAttempt}
+        onDeleteAll={handleDeleteAllAttempts}
         onWidthChange={(w) => setSidebarWidth(w)}
       />
       <Box
@@ -187,18 +220,14 @@ const PuzzlePage: React.FC = () => {
               <Button variant="outlined" onClick={() => navigate(-1)}>
                 Back
               </Button>
-              <Button
-                variant="contained"
-                onClick={handleStart}
-                disabled={attempt !== undefined}
-              >
+              <Button variant="contained" onClick={handleStart}>
                 Start
               </Button>
               <Button
                 variant="contained"
                 color="secondary"
                 onClick={handleSolve}
-                disabled={attempt?.solving}
+                disabled={attempt === undefined || attempt?.solving}
               >
                 Solve
               </Button>
@@ -219,6 +248,7 @@ const PuzzlePage: React.FC = () => {
                 <ClueColumns
                   clues={activePuzzle.clues}
                   onClueClick={handleClueClick}
+                  onClearAnswer={handleClearAnswer}
                 />
               </Box>
             </Fade>

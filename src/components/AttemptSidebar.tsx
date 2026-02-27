@@ -7,6 +7,7 @@ interface Props {
   attempts: AttemptSummary[];
   selectedAttemptId?: string;
   onSelect: (id: string) => void;
+  onDeleteAll: () => void;
   drawerWidth?: number;
   railWidth?: number;
   onWidthChange: (width: number) => void;
@@ -17,6 +18,7 @@ export default function AttemptSidebar({
   attempts,
   selectedAttemptId,
   onSelect,
+  onDeleteAll,
   drawerWidth = 260,
   railWidth = 44,
   onWidthChange,
@@ -32,6 +34,7 @@ export default function AttemptSidebar({
         attempts={attempts}
         selectedAttemptId={selectedAttemptId}
         onSelect={onSelect}
+        onDeleteAll={onDeleteAll}
       />
     </CollapsibleSidebar>
   );

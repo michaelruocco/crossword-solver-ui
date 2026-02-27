@@ -16,6 +16,12 @@ export interface CrosswordApi {
     answer: string,
   ): Promise<Attempt>;
   getPuzzleAttemptSummaries(puzzleId: string): Promise<AttemptSummary[]>;
+  deleteAttemptAnswer(
+    puzzleId: string,
+    attemptId: string,
+    clueId: string,
+  ): Promise<Attempt>;
+  deleteAllAttempts(puzzleId: string): Promise<void>;
 }
 
 export type Coordinates = z.infer<typeof CoordinatesSchema>;
@@ -62,6 +68,7 @@ export const PuzzleSchema = z.object({
   createdAt: z.coerce.date(),
   clues: CluesSchema,
   grid: GridSchema,
+  clueCount: z.number(),
 });
 
 export const PuzzleSummarySchema = z.object({
@@ -76,6 +83,7 @@ export const AttemptSchema = z.object({
   id: z.string(),
   createdAt: z.coerce.date(),
   solving: z.boolean(),
+  answerCount: z.number(),
   puzzle: PuzzleSchema,
 });
 
@@ -86,3 +94,28 @@ export const AttemptSummarySchema = z.object({
   answerCount: z.number(),
   clueCount: z.number(),
 });
+
+export const replaceAsAttemptSummary = (
+  attempts: AttemptSummary[],
+  updatedAttempt: Attempt,
+): AttemptSummary[] => {
+  let replaced = false;
+  const updatedAttempts = attempts.map((existingAttempt) => {
+    if (existingAttempt.id !== updatedAttempt.id) {
+      return existingAttempt;
+    }
+    replaced = true;
+    return toAttemptSummary(updatedAttempt);
+  });
+  return replaced ? updatedAttempts : attempts;
+};
+
+const toAttemptSummary = (attempt: Attempt): AttemptSummary => {
+  return {
+    id: attempt.id,
+    createdAt: attempt.createdAt,
+    solving: attempt.solving,
+    answerCount: attempt.answerCount,
+    clueCount: attempt.puzzle.clueCount,
+  };
+};

@@ -6,9 +6,14 @@ import ClueList from "./ClueList";
 interface Props {
   clues: Clues;
   onClueClick?: (clue: Clue) => void;
+  onClearAnswer?: (clue: Clue) => void;
 }
 
-const ClueColumns: React.FC<Props> = ({ clues, onClueClick }) => {
+const ClueColumns: React.FC<Props> = ({
+  clues,
+  onClueClick,
+  onClearAnswer,
+}) => {
   return (
     <Box
       sx={{
@@ -19,8 +24,18 @@ const ClueColumns: React.FC<Props> = ({ clues, onClueClick }) => {
         gap: 2,
       }}
     >
-      <ClueList title="Across" clues={clues.across} onClueClick={onClueClick} />
-      <ClueList title="Down" clues={clues.down} onClueClick={onClueClick} />
+      <ClueList
+        title="Across"
+        clues={clues.across}
+        onClueClick={onClueClick}
+        onClearAnswer={onClearAnswer}
+      />
+      <ClueList
+        title="Down"
+        clues={clues.down}
+        onClueClick={onClueClick}
+        onClearAnswer={onClearAnswer}
+      />
     </Box>
   );
 };
