@@ -1,6 +1,6 @@
-# Crossword solver API
+# Crossword solver UI
 
-Crossword solver API
+Crossword solver UI
 
 ## Useful Commands
 
