@@ -169,8 +169,6 @@ const PuzzlePage: React.FC = () => {
 
   const activePuzzle = attempt?.puzzle ?? puzzle;
 
-  console.log(`sidebar width ${sidebarWidth}`);
-
   return (
     <Box
       sx={{
